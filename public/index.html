@@ -950,6 +950,142 @@
   .sync-pill-amber  { background: rgba(239,159,39,0.12); color: var(--accent-amber); }
   .sync-pill-blue   { background: rgba(55,138,221,0.12); color: var(--accent-blue); }
 
+  /* ── DATE RANGE PICKER ── */
+  .date-range-wrap {
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  .date-input {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 12px;
+    color: var(--text-primary);
+    outline: none;
+    cursor: pointer;
+    width: 130px;
+    color-scheme: dark;
+  }
+
+  .date-input:focus { border-color: var(--accent-blue); }
+
+  /* ── SCORE BADGE ── */
+  .score-badge {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 6px 10px;
+    border-radius: 8px;
+    min-width: 68px;
+  }
+
+  .score-number {
+    font-size: 20px; font-weight: 700; line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  .score-text {
+    font-size: 9px; font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  /* ── PERFORMANCE BAR ── */
+  .perf-bar-wrap {
+    margin: 10px 0 4px;
+  }
+
+  .perf-bar-track {
+    height: 6px;
+    background: var(--bg-elevated);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .perf-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 400ms ease;
+  }
+
+  .perf-bar-labels {
+    display: flex; justify-content: space-between;
+    font-size: 10px; color: var(--text-secondary);
+    margin-top: 4px;
+  }
+
+  /* ── DIAGNOSTICS ── */
+  .diag-list {
+    display: flex; flex-direction: column; gap: 4px;
+    margin-top: 8px;
+  }
+
+  .diag-item {
+    font-size: 11px;
+    line-height: 1.4;
+    padding: 5px 8px;
+    border-radius: 6px;
+    border-left: 2px solid;
+  }
+
+  .diag-warn  { background: rgba(239,159,39,0.07); border-color: var(--accent-amber); color: var(--accent-amber); }
+  .diag-ok    { background: rgba(29,158,117,0.07); border-color: var(--accent-green); color: var(--accent-green); }
+  .diag-rec   { background: rgba(55,138,221,0.07); border-color: var(--accent-blue);  color: var(--accent-blue);  }
+  .diag-crit  { background: rgba(226,75,74,0.07);  border-color: var(--accent-red);   color: var(--accent-red);   }
+
+  /* ── FUNNEL ── */
+  .funnel-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+
+  .funnel-header {
+    padding: 16px 20px 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: baseline; gap: 10px;
+  }
+
+  .funnel-title { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+  .funnel-sub   { font-size: 11px; color: var(--text-secondary); }
+
+  .funnel-table { width: 100%; border-collapse: collapse; }
+
+  .funnel-table th {
+    padding: 9px 16px;
+    font-size: 10px; font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase; letter-spacing: .05em;
+    background: var(--bg-elevated);
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+  }
+
+  .funnel-table td {
+    padding: 10px 16px;
+    font-size: 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+
+  .funnel-table tr:last-child td { border-bottom: none; }
+  .funnel-table tr:hover td { background: var(--bg-elevated); }
+
+  .funnel-stage { font-weight: 500; color: var(--text-primary); }
+  .funnel-real  { font-variant-numeric: tabular-nums; font-weight: 600; }
+  .funnel-ideal { color: var(--text-secondary); font-size: 11px; }
+
+  .funnel-status-ok   { color: var(--accent-green); font-size: 15px; }
+  .funnel-status-warn { color: var(--accent-amber); font-size: 15px; }
+  .funnel-status-na   { color: var(--text-muted);   font-size: 12px; }
+
+  .funnel-diag {
+    font-size: 11px; color: var(--accent-amber);
+    padding: 4px 0 0; font-style: italic;
+  }
+
   /* ── META API MODAL ── */
   .modal-overlay {
     position: fixed; inset: 0;
@@ -1189,17 +1325,16 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
         <input type="text" id="global-search" placeholder="Buscar campanhas, anúncios..." oninput="handleSearch(this.value)">
       </div>
-      <select class="period-select" id="period-select" onchange="handlePeriodChange(this.value)">
-        <option value="1">Hoje</option>
-        <option value="7" selected>Últimos 7 dias</option>
-        <option value="14">Últimos 14 dias</option>
-        <option value="30">Últimos 30 dias</option>
-      </select>
+      <div class="date-range-wrap">
+        <input type="date" id="date-since" class="date-input">
+        <span style="color:var(--text-muted);font-size:11px">→</span>
+        <input type="date" id="date-until" class="date-input">
+        <button class="btn btn-primary btn-sm" id="sync-btn" onclick="handleSyncClick()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3"/></svg>
+          Sincronizar
+        </button>
+      </div>
       <span id="sync-status" style="font-size:11px;color:var(--text-secondary);display:none"></span>
-      <button class="btn btn-primary btn-sm" id="sync-btn" onclick="showApiModal()">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
-        Conectar Meta API
-      </button>
     </div>
   </header>
 
@@ -1264,6 +1399,7 @@
           <div style="padding: 0 20px 16px;" id="bottom-ads-list"></div>
         </div>
       </div>
+      <div id="funnel-section"></div>
     </div>
 
     <!-- ══ SCREEN: CAMPAIGNS ══ -->
@@ -1368,7 +1504,8 @@
         </select>
         <div class="filter-divider"></div>
         <span class="filter-label">Ordenar:</span>
-        <select class="filter-select" id="ads-sort" onchange="renderAds()" style="min-width:130px;">
+        <select class="filter-select" id="ads-sort" onchange="renderAds()" style="min-width:140px;">
+          <option value="score">Por Score</option>
           <option value="compras">Por Compras</option>
           <option value="cpr">Por CPR (menor)</option>
           <option value="ctr">Por CTR</option>
@@ -1401,7 +1538,7 @@
 // STATE
 // ══════════════════════════════════════════
 let DATA = null;
-let periodMultiplier = 1;
+let periodMultiplier = 1; // kept for legacy fmtCur calls — always 1 now
 let sortState = {};
 let activeCountries = new Set();
 let searchQuery = '';
@@ -1500,11 +1637,25 @@ function hideSkeleton() {
 }
 
 // ══════════════════════════════════════════
-// PERIOD + SEARCH
+// DATE RANGE + SEARCH
 // ══════════════════════════════════════════
-function handlePeriodChange(val) {
-  periodMultiplier = parseFloat(val) / 7;
-  navigate(getCurrentScreen());
+function initDatePicker() {
+  const today = new Date().toISOString().slice(0, 10);
+  document.getElementById('date-since').value = today;
+  document.getElementById('date-until').value = today;
+}
+
+function getDateRange() {
+  return {
+    since: document.getElementById('date-since').value,
+    until: document.getElementById('date-until').value,
+  };
+}
+
+function handleSyncClick() {
+  const token = document.getElementById('status-dot').classList.contains('connected');
+  if (!token) { showApiModal(); return; }
+  triggerSync();
 }
 
 function getCurrentScreen() {
@@ -1520,9 +1671,7 @@ function handleSearch(val) {
   else if (screen === 'ads') renderAds();
 }
 
-function applyMultiplier(m) {
-  return m * periodMultiplier;
-}
+function applyMultiplier(m) { return m; } // no multiplier — real date range data
 
 // ══════════════════════════════════════════
 // HELPERS
@@ -1598,6 +1747,50 @@ function renderMarkdown(text) {
 }
 
 // ══════════════════════════════════════════
+// PERFORMANCE SCORE (client-side, for display)
+// ══════════════════════════════════════════
+function calcPerformanceScore(m) {
+  let s = 0;
+  if      (m.ctr >= 3)   s += 30; else if (m.ctr >= 2)   s += 24;
+  else if (m.ctr >= 1.5) s += 18; else if (m.ctr >= 1)   s += 10;
+  if      (m.cpc <= 0.40) s += 25; else if (m.cpc <= 0.70) s += 20;
+  else if (m.cpc <= 1.00) s += 14; else if (m.cpc <= 1.50) s += 7;
+  if (m.custo_por_resultado > 0) {
+    if      (m.custo_por_resultado <= 10) s += 30; else if (m.custo_por_resultado <= 20) s += 24;
+    else if (m.custo_por_resultado <= 30) s += 15; else if (m.custo_por_resultado <= 45) s += 7;
+  }
+  if      ((m.frequencia || 0) <= 2.0) s += 15; else if ((m.frequencia || 0) <= 3.0) s += 8;
+  return s;
+}
+
+function getScoreLabel(score) {
+  if (score >= 85) return { label: 'EXCELENTE', color: '#1D9E75', bg: 'rgba(29,158,117,0.12)' };
+  if (score >= 70) return { label: 'ÓTIMO',     color: '#5DCAA5', bg: 'rgba(93,202,165,0.10)' };
+  if (score >= 55) return { label: 'BOM',        color: '#EF9F27', bg: 'rgba(239,159,39,0.12)' };
+  if (score >= 35) return { label: 'REGULAR',    color: '#E87B3A', bg: 'rgba(232,123,58,0.12)' };
+  if (score >= 15) return { label: 'RUIM',       color: '#E24B4A', bg: 'rgba(226,75,74,0.12)' };
+  return              { label: 'CRÍTICO',    color: '#ff2222', bg: 'rgba(255,34,34,0.12)' };
+}
+
+function scoreBarColor(score) {
+  if (score >= 70) return 'var(--accent-green)';
+  if (score >= 45) return 'var(--accent-amber)';
+  return 'var(--accent-red)';
+}
+
+function genDiagnostics(m, score) {
+  const diags = [];
+  if (m.ctr < 1)                              diags.push({ type: 'crit', text: 'CTR crítico — hook não está parando o scroll' });
+  if ((m.frequencia || 0) > 3)               diags.push({ type: 'warn', text: 'Audiência saturada — inserir criativos novos' });
+  if (m.cpc > 1.50)                          diags.push({ type: 'warn', text: 'CPC alto — revisar targeting ou criativo' });
+  if (m.ctr >= 2.5 && m.cpc <= 0.70)        diags.push({ type: 'ok',   text: 'Criativo engajando bem' });
+  if (m.custo_por_resultado > 0 && m.custo_por_resultado <= 15) diags.push({ type: 'ok', text: 'CPR eficiente — candidato a escala' });
+  if (score >= 70) diags.push({ type: 'rec', text: 'Recomendação: Aumentar budget 20%' });
+  if (score <= 35 && score > 0) diags.push({ type: 'rec', text: 'Recomendação: Pausar e substituir criativo' });
+  return diags.slice(0, 3);
+}
+
+// ══════════════════════════════════════════
 // OVERVIEW
 // ══════════════════════════════════════════
 function renderOverview() {
@@ -1636,6 +1829,7 @@ function renderOverview() {
   `).join('');
 
   renderSyncStatusCard();
+  renderFunnel();
   renderCountryChart();
   renderCampaignChart();
   renderTopAds();
@@ -1830,6 +2024,136 @@ function renderBottomAds() {
 }
 
 // ══════════════════════════════════════════
+// FUNNEL
+// ══════════════════════════════════════════
+function renderFunnel() {
+  const container = document.getElementById('funnel-section');
+  if (!container) return;
+
+  // Aggregate from allAds
+  let alcance = 0, impressoes = 0, cliques = 0, lp = 0, checkout = 0, compras = 0, spend = 0;
+  allAds.forEach(a => {
+    alcance    += a.metrics.alcance              || 0;
+    impressoes += a.metrics.impressoes           || 0;
+    cliques    += a.metrics.cliques              || 0;
+    lp         += a.metrics.landing_page_views   || 0;
+    checkout   += a.metrics.checkout_iniciado    || 0;
+    compras    += a.metrics.compras              || 0;
+    spend      += a.metrics.investimento         || 0;
+  });
+
+  // Also use DATA.funnel if available (aggregated by server)
+  if (DATA.funnel && DATA.funnel.alcance > 0) {
+    alcance    = DATA.funnel.alcance            || alcance;
+    impressoes = DATA.funnel.impressoes         || impressoes;
+    cliques    = DATA.funnel.cliques            || cliques;
+    lp         = DATA.funnel.landing_page_views || lp;
+    checkout   = DATA.funnel.checkout_iniciado  || checkout;
+    compras    = DATA.funnel.compras            || compras;
+  }
+
+  const ctr     = impressoes > 0 ? (cliques / impressoes * 100) : 0;
+  const lpRate  = cliques > 0    ? (lp / cliques * 100)         : 0;
+  const ckRate  = lp > 0         ? (checkout / lp * 100)        : 0;
+  const convRate = checkout > 0  ? (compras / checkout * 100)   : 0;
+  const cpr     = compras > 0    ? (spend / compras)            : 0;
+
+  function statusIcon(ok) {
+    return ok
+      ? '<span class="funnel-status-ok">✓</span>'
+      : '<span class="funnel-status-warn">✗</span>';
+  }
+
+  function diagRow(cond, msg) {
+    if (!cond) return '';
+    return `<tr><td colspan="5" class="funnel-diag" style="padding-top:2px;padding-bottom:8px">⚠ ${msg}</td></tr>`;
+  }
+
+  const noData = impressoes === 0;
+
+  container.innerHTML = `
+    <div class="funnel-card">
+      <div class="funnel-header">
+        <span class="funnel-title">Funil de Performance</span>
+        <span class="funnel-sub">${noData ? 'Sincronize dados reais para ver o funil' : 'Dados do período selecionado vs benchmarks Europa'}</span>
+      </div>
+      <table class="funnel-table">
+        <thead>
+          <tr>
+            <th>Estágio</th>
+            <th>Real</th>
+            <th>Ideal</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="funnel-stage">Alcance</td>
+            <td class="funnel-real">${fmt(alcance)}</td>
+            <td class="funnel-ideal">—</td>
+            <td class="funnel-status-na">—</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td class="funnel-stage">Impressões</td>
+            <td class="funnel-real">${fmt(impressoes)}</td>
+            <td class="funnel-ideal">—</td>
+            <td class="funnel-status-na">—</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td class="funnel-stage">Cliques</td>
+            <td class="funnel-real">${fmt(cliques)}</td>
+            <td class="funnel-ideal">—</td>
+            <td class="funnel-status-na">—</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td class="funnel-stage">CTR</td>
+            <td class="funnel-real" style="color:${ctr >= 2 ? 'var(--accent-green)' : ctr >= 1 ? 'var(--accent-amber)' : 'var(--accent-red)'}">${ctr.toFixed(2)}%</td>
+            <td class="funnel-ideal">&gt;2.0%</td>
+            <td>${impressoes > 0 ? statusIcon(ctr >= 2) : '<span class="funnel-status-na">—</span>'}</td>
+            <td></td>
+          </tr>
+          ${diagRow(impressoes > 0 && ctr < 1, 'CTR abaixo do ideal → problema no criativo, não na audiência')}
+          <tr>
+            <td class="funnel-stage">Landing Page Views</td>
+            <td class="funnel-real">${fmt(lp)}</td>
+            <td class="funnel-ideal">&gt;70% dos cliques</td>
+            <td>${cliques > 0 ? statusIcon(lpRate >= 70) : '<span class="funnel-status-na">—</span>'}</td>
+            <td class="funnel-ideal">${cliques > 0 ? lpRate.toFixed(0) + '%' : '—'}</td>
+          </tr>
+          ${diagRow(cliques > 0 && ctr >= 1.5 && lpRate < 50, 'Alta taxa clique→landing baixa → problema na landing page ou velocidade')}
+          <tr>
+            <td class="funnel-stage">Iniciou Checkout</td>
+            <td class="funnel-real">${fmt(checkout)}</td>
+            <td class="funnel-ideal">&gt;15% das views</td>
+            <td>${lp > 0 ? statusIcon(ckRate >= 15) : '<span class="funnel-status-na">—</span>'}</td>
+            <td class="funnel-ideal">${lp > 0 ? ckRate.toFixed(0) + '%' : '—'}</td>
+          </tr>
+          <tr>
+            <td class="funnel-stage">Compras</td>
+            <td class="funnel-real" style="color:var(--accent-green);font-weight:600">${fmt(compras)}</td>
+            <td class="funnel-ideal">&gt;30% do checkout</td>
+            <td>${checkout > 0 ? statusIcon(convRate >= 30) : '<span class="funnel-status-na">—</span>'}</td>
+            <td class="funnel-ideal">${checkout > 0 ? convRate.toFixed(0) + '%' : '—'}</td>
+          </tr>
+          ${diagRow(checkout > 0 && convRate < 20, 'Checkout iniciado mas baixa conversão → problema no checkout ou preço')}
+          <tr>
+            <td class="funnel-stage">CPR</td>
+            <td class="funnel-real" style="color:${cpr > 0 && cpr <= 20 ? 'var(--accent-green)' : cpr <= 35 ? 'var(--accent-amber)' : 'var(--accent-red)'}">${cpr > 0 ? '€' + cpr.toFixed(2) : '—'}</td>
+            <td class="funnel-ideal">&lt;€20</td>
+            <td>${compras > 0 ? statusIcon(cpr <= 20) : '<span class="funnel-status-na">—</span>'}</td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+// ══════════════════════════════════════════
 // CAMPAIGNS
 // ══════════════════════════════════════════
 let campaignSort = { col: 'investimento', dir: 'desc' };
@@ -2009,11 +2333,11 @@ function toggleAdsetExpand(id) {
 // ══════════════════════════════════════════
 function renderAds() {
   if (!DATA) return;
-  const campFilter = document.getElementById('ads-camp-filter').value;
+  const campFilter    = document.getElementById('ads-camp-filter').value;
   const countryFilter = document.getElementById('ads-country-filter').value;
-  const formatFilter = document.getElementById('ads-format-filter').value;
-  const statusFilter = document.getElementById('ads-status-filter').value;
-  const sortBy = document.getElementById('ads-sort').value;
+  const formatFilter  = document.getElementById('ads-format-filter').value;
+  const statusFilter  = document.getElementById('ads-status-filter').value;
+  const sortBy        = document.getElementById('ads-sort').value;
 
   let ads = allAds.filter(a => {
     if (campFilter !== 'all' && a.campaignId !== campFilter) return false;
@@ -2024,9 +2348,17 @@ function renderAds() {
     return true;
   });
 
-  if (sortBy === 'compras') ads.sort((a, b) => b.metrics.compras - a.metrics.compras);
-  else if (sortBy === 'cpr') ads.sort((a, b) => a.metrics.custo_por_resultado - b.metrics.custo_por_resultado);
-  else if (sortBy === 'ctr') ads.sort((a, b) => b.metrics.ctr - a.metrics.ctr);
+  // Enrich with client-side score if not set by server
+  ads = ads.map(a => {
+    const score = a.score ?? calcPerformanceScore(a.metrics);
+    const sl    = a.score_color ? { label: a.score_label, color: a.score_color, bg: a.score_bg } : getScoreLabel(score);
+    return { ...a, _score: score, _sl: sl };
+  });
+
+  if (sortBy === 'score')       ads.sort((a, b) => b._score - a._score);
+  else if (sortBy === 'compras')     ads.sort((a, b) => b.metrics.compras - a.metrics.compras);
+  else if (sortBy === 'cpr')         ads.sort((a, b) => a.metrics.custo_por_resultado - b.metrics.custo_por_resultado);
+  else if (sortBy === 'ctr')         ads.sort((a, b) => b.metrics.ctr - a.metrics.ctr);
   else if (sortBy === 'investimento') ads.sort((a, b) => b.metrics.investimento - a.metrics.investimento);
 
   document.getElementById('ads-result-count').textContent = `${ads.length} anúncio${ads.length !== 1 ? 's' : ''} encontrado${ads.length !== 1 ? 's' : ''}`;
@@ -2036,27 +2368,52 @@ function renderAds() {
     return;
   }
 
-  const thumbIcon = fmt => {
-    if (fmt === 'VIDEO') return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 10l4.553-2.069A1 1 0 0121 8.869v6.262a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg><span>${fmt}</span>`;
-    if (fmt === 'CAROUSEL') return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="M18 10l4 2-4 2V10z"/></svg><span>${fmt}</span>`;
-    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>${fmt}</span>`;
-  };
-
   document.getElementById('ad-grid').innerHTML = ads.map(a => {
-    const m = a.metrics;
-    const cpr = m.custo_por_resultado;
-    const inv = applyMultiplier(m.investimento);
-    const comp = Math.round(applyMultiplier(m.compras));
-    const ped = Math.round(applyMultiplier(m.pedidos));
-    const barPct = cprPct(cpr);
-    const barCls = cprClass(cpr);
+    const m    = a.metrics;
+    const cpr  = m.custo_por_resultado;
+    const inv  = m.investimento;
+    const sl   = a._sl;
+    const sc   = a._score;
+    const freq = m.frequencia || 0;
+    const diags = genDiagnostics(m, sc);
+
+    const ctrDelta = m.ctr >= 2 ? `<span style="color:var(--accent-green);font-size:10px">▲</span>`
+                   : m.ctr >= 1 ? `<span style="color:var(--accent-amber);font-size:10px">◆</span>`
+                   : `<span style="color:var(--accent-red);font-size:10px">▼</span>`;
+
+    const cpcDelta = m.cpc <= 0.70 ? `<span style="color:var(--accent-green);font-size:10px">▲</span>`
+                   : m.cpc <= 1.50 ? `<span style="color:var(--accent-amber);font-size:10px">◆</span>`
+                   : `<span style="color:var(--accent-red);font-size:10px">▼</span>`;
+
+    const freqAlert = freq > 3
+      ? `<span style="color:var(--accent-red);font-size:10px" title="Audiência saturada">⚠ ${freq.toFixed(1)}x</span>`
+      : `<span style="color:${freq > 2 ? 'var(--accent-amber)' : 'var(--text-secondary)'}">${freq.toFixed(1)}x</span>`;
+
+    const thumbSvg = a.format === 'VIDEO'
+      ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 10l4.553-2.069A1 1 0 0121 8.869v6.262a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>`
+      : a.format === 'CAROUSEL'
+      ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="M18 10l4 2-4 2V10z"/></svg>`
+      : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>`;
+
+    const diagHtml = diags.map(d =>
+      `<div class="diag-item diag-${d.type}">${d.text}</div>`
+    ).join('');
 
     return `
       <div class="ad-card">
-        <div class="ad-thumb">
-          <div class="ad-thumb-icon">${thumbIcon(a.format)}</div>
+        <div class="ad-thumb" style="position:relative">
+          <div class="ad-thumb-icon" style="opacity:0.35">
+            ${thumbSvg}
+            <span style="font-size:10px;color:var(--text-secondary)">${a.format}</span>
+          </div>
           <div class="ad-thumb-format">${formatBadge(a.format)}</div>
           <div class="ad-thumb-status">${statusBadge(a.status, cpr)}</div>
+          <div style="position:absolute;bottom:10px;right:10px">
+            <div class="score-badge" style="background:${sl.bg}">
+              <span class="score-number" style="color:${sl.color}">${sc}</span>
+              <span class="score-text" style="color:${sl.color}">${sl.label}</span>
+            </div>
+          </div>
         </div>
         <div class="ad-body">
           <div class="ad-name">${a.name}</div>
@@ -2065,48 +2422,54 @@ function renderAds() {
             <span style="color:var(--text-muted)">·</span>
             ${a.countries.map(c => `<span>${flagFor(c)} ${c}</span>`).join(' ')}
           </div>
+
           <div class="ad-metrics">
             <div class="ad-metric">
               <div class="ad-metric-label">Investido</div>
               <div class="ad-metric-value">R$\u00a0${inv.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
             </div>
             <div class="ad-metric">
-              <div class="ad-metric-label">CTR</div>
-              <div class="ad-metric-value">${m.ctr.toFixed(2)}%</div>
+              <div class="ad-metric-label">CTR ${ctrDelta}</div>
+              <div class="ad-metric-value" style="color:${m.ctr>=2?'var(--accent-green)':m.ctr>=1?'var(--accent-amber)':'var(--accent-red)'}">${m.ctr.toFixed(2)}%</div>
             </div>
             <div class="ad-metric">
-              <div class="ad-metric-label">CPC</div>
-              <div class="ad-metric-value">€${m.cpc.toFixed(2)}</div>
+              <div class="ad-metric-label">CPC ${cpcDelta}</div>
+              <div class="ad-metric-value" style="color:${m.cpc<=0.70?'var(--accent-green)':m.cpc<=1.50?'var(--accent-amber)':'var(--accent-red)'}">€${m.cpc.toFixed(2)}</div>
             </div>
             <div class="ad-metric">
-              <div class="ad-metric-label">Pedidos</div>
-              <div class="ad-metric-value">${ped}</div>
+              <div class="ad-metric-label">Frequência</div>
+              <div class="ad-metric-value">${freqAlert}</div>
             </div>
             <div class="ad-metric">
-              <div class="ad-metric-label">Compras</div>
-              <div class="ad-metric-value" style="color:var(--accent-green)">${comp}</div>
+              <div class="ad-metric-label">Cliques únicos</div>
+              <div class="ad-metric-value">${fmt(m.cliques_unicos || m.cliques)}</div>
             </div>
             <div class="ad-metric">
-              <div class="ad-metric-label">CPR</div>
-              <div class="ad-metric-value" style="color:${cprColor(cpr)}">€${cpr.toFixed(2)}</div>
+              <div class="ad-metric-label">Custo/Result.</div>
+              <div class="ad-metric-value" style="color:${cprColor(cpr)}">${cpr > 0 ? '€' + cpr.toFixed(2) : '—'}</div>
             </div>
           </div>
-          <div class="cpr-bar-wrap">
-            <div class="cpr-bar-label">
-              <span>Performance CPR</span>
-              <span style="color:${cprColor(cpr)}">${cpr <= 15 ? 'Excelente' : cpr <= 22 ? 'Regular' : 'Crítico'}</span>
+
+          <div class="perf-bar-wrap">
+            <div class="perf-bar-track">
+              <div class="perf-bar-fill" style="width:${sc}%;background:${scoreBarColor(sc)}"></div>
             </div>
-            <div class="cpr-bar">
-              <div class="cpr-fill ${barCls}" style="width:${barPct}%"></div>
+            <div class="perf-bar-labels">
+              <span>0</span>
+              <span style="color:${sl.color};font-weight:600">${sc}/100 — ${sl.label}</span>
+              <span>100</span>
             </div>
           </div>
-          <div style="font-size:11px;color:var(--text-secondary)">${a.adset}</div>
+
+          ${diagHtml ? `<div class="diag-list">${diagHtml}</div>` : ''}
+
+          <div style="font-size:11px;color:var(--text-secondary);margin-top:6px">${a.adset}</div>
         </div>
         <div class="ad-footer">
           <span style="font-size:11px;color:var(--text-muted)">${a.id}</span>
           <button class="btn btn-ghost btn-sm" onclick="analyzeAd('${a.id}', event)">
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17H8v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/><path d="M9 21h6"/></svg>
-            Ver análise IA
+            Analisar com IA
           </button>
         </div>
       </div>
@@ -2120,7 +2483,13 @@ function analyzeAd(adId, evt) {
   if (!ad) return;
   navigate('insights');
   setTimeout(() => {
-    callAI(`Analise em detalhe o anúncio "${ad.name}" (${ad.format}) da campanha "${ad.campaign}". Métricas: Investimento R$${ad.metrics.investimento.toFixed(2)}, CTR ${ad.metrics.ctr}%, CPC €${ad.metrics.cpc.toFixed(2)}, ${ad.metrics.compras} compras, CPR €${ad.metrics.custo_por_resultado.toFixed(2)}. Status: ${ad.status}. Dê recomendações específicas e acionáveis.`, `Análise: ${ad.name}`);
+    const sc = ad.score ?? calcPerformanceScore(ad.metrics);
+    const sl = ad.score_label ?? getScoreLabel(sc).label;
+    callAI(`Analise o anúncio "${ad.name}" (${ad.format}) da campanha "${ad.campaign}".
+Performance Score: ${sc}/100 — ${sl}
+Métricas: Investimento R$${ad.metrics.investimento.toFixed(2)}, CTR ${ad.metrics.ctr.toFixed(2)}%, CPC €${ad.metrics.cpc.toFixed(2)}, Frequência ${(ad.metrics.frequencia||0).toFixed(1)}x, ${ad.metrics.compras} compras, CPR €${ad.metrics.custo_por_resultado.toFixed(2)}.
+Status: ${ad.status}.
+Com base nessas métricas, o que devo fazer com este anúncio? Seja direto e acionável.`, `Análise: ${ad.name}`);
   }, 400);
 }
 
@@ -2476,8 +2845,8 @@ async function saveTokenAndSync() {
 
     // 2. Sync
     btn.innerHTML = '<span class="spinner"></span> Sincronizando campanhas...';
-    const period = document.getElementById('period-select').value;
-    const syncRes = await fetch(`/api/meta/sync?period=${period}`);
+    const { since, until } = getDateRange();
+    const syncRes = await fetch(`/api/meta/sync?since=${since}&until=${until}`);
     const syncData = await syncRes.json();
 
     if (syncData.error === 'token_expired') {
@@ -2487,8 +2856,11 @@ async function saveTokenAndSync() {
     if (!syncRes.ok) { modalAlert(syncData.message || syncData.error || 'Erro na sincronização.', 'error'); return; }
 
     // 3. Success
-    modalAlert(`✓ ${syncData.campaigns_count} campanhas sincronizadas com sucesso!`, 'success');
-    updateSyncStatus(syncData.updated_at, true);
+    const { since: s, until: u } = getDateRange();
+    const sf = new Date(s + 'T00:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+    const uf = new Date(u + 'T00:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+    modalAlert(`✓ ${syncData.campaigns_count} campanhas sincronizadas — ${sf} até ${uf}`, 'success');
+    updateSyncStatus(syncData.updated_at, true, s, u);
     setTimeout(async () => {
       closeApiModal();
       await reloadData();
@@ -2502,20 +2874,23 @@ async function saveTokenAndSync() {
   }
 }
 
-function updateSyncStatus(timestamp, connected) {
-  const dot  = document.getElementById('status-dot');
-  const text = document.getElementById('status-text');
+function updateSyncStatus(timestamp, connected, since, until) {
+  const dot    = document.getElementById('status-dot');
+  const text   = document.getElementById('status-text');
   const syncEl = document.getElementById('sync-status');
-  const btn = document.getElementById('sync-btn');
+  const btn    = document.getElementById('sync-btn');
 
   if (connected) {
     dot.classList.add('connected');
     text.textContent = 'Meta API conectada';
-    btn.textContent = '↺ Sincronizar';
-    btn.onclick = triggerSync;
+    btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3"/></svg> Sincronizar`;
+    btn.onclick = handleSyncClick;
     if (timestamp) {
-      const d = new Date(timestamp);
-      syncEl.textContent = `Última sync: ${d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+      const d  = new Date(timestamp);
+      const hm = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      const sf = since ? new Date(since + 'T00:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) : '';
+      const uf = until ? new Date(until + 'T00:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) : '';
+      syncEl.textContent = sf && uf ? `Dados de ${sf} até ${uf} — sync ${hm}` : `Última sync: ${hm}`;
       syncEl.style.display = 'inline';
     }
   } else {
@@ -2533,8 +2908,8 @@ async function triggerSync() {
   btn.disabled = true;
 
   try {
-    const period = document.getElementById('period-select').value;
-    const res = await fetch(`/api/meta/sync?period=${period}`);
+    const { since, until } = getDateRange();
+    const res = await fetch(`/api/meta/sync?since=${since}&until=${until}`);
     const data = await res.json();
 
     if (data.error === 'token_expired') {
@@ -2543,13 +2918,13 @@ async function triggerSync() {
       return;
     }
     if (data.success) {
-      updateSyncStatus(data.updated_at, true);
+      updateSyncStatus(data.updated_at, true, data.since, data.until);
       await reloadData();
     }
   } catch (err) {
     console.error('Sync failed:', err);
   } finally {
-    btn.innerHTML = '↺ Sincronizar';
+    btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3"/></svg> Sincronizar`;
     btn.disabled = false;
   }
 }
@@ -2567,9 +2942,12 @@ async function reloadData() {
 
 async function checkMetaStatus() {
   try {
-    const res = await fetch('/api/meta/status');
+    const res  = await fetch('/api/meta/status');
     const data = await res.json();
-    if (data.connected) updateSyncStatus(data.last_sync, true);
+    if (data.connected) updateSyncStatus(data.last_sync, true, data.last_since, data.last_until);
+    // Restore saved dates to picker
+    if (data.last_since) document.getElementById('date-since').value = data.last_since;
+    if (data.last_until) document.getElementById('date-until').value = data.last_until;
   } catch { /* silent */ }
 }
 
@@ -2577,6 +2955,7 @@ async function checkMetaStatus() {
 // BOOTSTRAP
 // ══════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', async () => {
+  initDatePicker();
   await init();
   await checkMetaStatus();
 });
