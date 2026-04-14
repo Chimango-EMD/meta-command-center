@@ -97,6 +97,13 @@ function extractInsights(insights) {
 app.get('/api/campaigns', (req, res) => {
   try {
     const data = JSON.parse(fs.readFileSync(CAMPAIGNS_FILE, 'utf8'));
+    // Merge last_sync from config if not in file
+    if (!data.last_sync) {
+      const cfg = readConfig();
+      data.last_sync     = cfg.last_sync     || null;
+      data.last_preset   = cfg.last_preset   || null;
+      data.last_purchases = cfg.last_purchases ?? null;
+    }
     res.json(data);
   } catch (err) {
     res.status(500).json({ error: 'Failed to load campaign data' });
@@ -315,17 +322,52 @@ app.get('/api/meta/sync', async (req, res) => {
       });
     }
 
-    // Save to disk
-    const result = { campaigns };
-    fs.writeFileSync(CAMPAIGNS_FILE, JSON.stringify(result, null, 2));
+    // ── Compute totals for status card ──
+    let totalPurchases = 0;
+    let totalSpend     = 0;
+    campaigns.forEach(c => c.adsets.forEach(as => {
+      as.ads.forEach(a => {
+        totalPurchases += a.metrics.compras || 0;
+        totalSpend     += a.metrics.investimento || 0;
+      });
+    }));
+    const hasPurchases = totalPurchases > 0;
 
-    // Update config with last_sync
+    // ── Save to disk (overwrite completely) ──
+    const syncedAt = new Date().toISOString();
+    const payload  = { campaigns, last_sync: syncedAt };
+
+    try {
+      fs.writeFileSync(CAMPAIGNS_FILE, JSON.stringify(payload, null, 2), { encoding: 'utf8', flag: 'w' });
+      // Verify write
+      const verify = JSON.parse(fs.readFileSync(CAMPAIGNS_FILE, 'utf8'));
+      if (verify.campaigns.length !== campaigns.length) {
+        throw new Error(`Verificação falhou: escrito ${campaigns.length}, lido ${verify.campaigns.length}`);
+      }
+      console.log(`[Meta Sync] ✓ campaigns.json sobrescrito — ${campaigns.length} campanhas, ${totalPurchases} compras`);
+    } catch (writeErr) {
+      console.error('[Meta Sync] Erro ao salvar campaigns.json:', writeErr.message);
+      return res.status(500).json({ error: 'write_failed', message: writeErr.message });
+    }
+
+    // ── Update meta-config ──
     const cfg = readConfig();
-    cfg.last_sync = new Date().toISOString();
+    cfg.last_sync        = syncedAt;
+    cfg.last_preset      = preset;
+    cfg.last_camp_count  = campaigns.length;
+    cfg.last_purchases   = totalPurchases;
     writeConfig(cfg);
 
-    console.log(`[Meta Sync] ✓ ${campaigns.length} campanhas sincronizadas — ${preset}`);
-    res.json({ success: true, updated_at: cfg.last_sync, campaigns_count: campaigns.length });
+    console.log(`[Meta Sync] ✓ ${campaigns.length} campanhas — ${preset} — spend R$${totalSpend.toFixed(2)} — purchases: ${totalPurchases}`);
+    res.json({
+      success:          true,
+      updated_at:       syncedAt,
+      campaigns_count:  campaigns.length,
+      period:           preset,
+      total_purchases:  totalPurchases,
+      total_spend:      totalSpend,
+      has_purchases:    hasPurchases,
+    });
 
   } catch (err) {
     console.error('[Meta Sync] Error:', err.message);

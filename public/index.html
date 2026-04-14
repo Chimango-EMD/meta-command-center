@@ -896,6 +896,60 @@
     font-size: 13px;
   }
 
+  /* ── SYNC STATUS CARD ── */
+  .sync-card {
+    border-radius: 10px;
+    padding: 12px 18px;
+    display: flex; align-items: center; gap: 14px;
+    border: 1px solid;
+    font-size: 12px;
+  }
+
+  .sync-card.ok {
+    background: rgba(29,158,117,0.06);
+    border-color: rgba(29,158,117,0.2);
+    color: var(--text-secondary);
+  }
+
+  .sync-card.warn {
+    background: rgba(239,159,39,0.07);
+    border-color: rgba(239,159,39,0.25);
+    color: var(--text-secondary);
+  }
+
+  .sync-card.empty {
+    background: rgba(55,138,221,0.05);
+    border-color: rgba(55,138,221,0.15);
+    color: var(--text-secondary);
+  }
+
+  .sync-card-icon {
+    width: 30px; height: 30px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .sync-card.ok   .sync-card-icon { background: rgba(29,158,117,0.12); }
+  .sync-card.warn .sync-card-icon { background: rgba(239,159,39,0.12); }
+  .sync-card.empty .sync-card-icon { background: rgba(55,138,221,0.10); }
+
+  .sync-card-icon svg { width: 14px; height: 14px; }
+  .sync-card.ok   .sync-card-icon svg { color: var(--accent-green); }
+  .sync-card.warn .sync-card-icon svg { color: var(--accent-amber); }
+  .sync-card.empty .sync-card-icon svg { color: var(--accent-blue); }
+
+  .sync-card-body { flex: 1; }
+  .sync-card-title { font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
+  .sync-card-meta { font-size: 11px; color: var(--text-secondary); }
+
+  .sync-pill {
+    padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 500;
+  }
+
+  .sync-pill-green  { background: rgba(29,158,117,0.12); color: var(--accent-green); }
+  .sync-pill-amber  { background: rgba(239,159,39,0.12); color: var(--accent-amber); }
+  .sync-pill-blue   { background: rgba(55,138,221,0.12); color: var(--accent-blue); }
+
   /* ── META API MODAL ── */
   .modal-overlay {
     position: fixed; inset: 0;
@@ -1175,6 +1229,7 @@
     <!-- ══ SCREEN: OVERVIEW ══ -->
     <div id="screen-overview" class="screen active">
       <div class="kpi-grid" id="kpi-grid"></div>
+      <div id="sync-status-card" style="display:none;margin-bottom:16px"></div>
       <div class="charts-grid" id="charts-grid">
         <div class="chart-card">
           <div class="chart-title">Investimento por País</div>
@@ -1580,10 +1635,73 @@ function renderOverview() {
     </div>
   `).join('');
 
+  renderSyncStatusCard();
   renderCountryChart();
   renderCampaignChart();
   renderTopAds();
   renderBottomAds();
+}
+
+function renderSyncStatusCard() {
+  const card = document.getElementById('sync-status-card');
+  const lastSync    = DATA.last_sync;
+  const campCount   = DATA.campaigns?.length ?? 0;
+  const purchases   = DATA.last_purchases ?? null;
+  const preset      = DATA.last_preset || null;
+
+  const presetLabel = { last_7d: 'Últimos 7 dias', last_14d: 'Últimos 14 dias', last_30d: 'Últimos 30 dias', today: 'Hoje', this_month: 'Este mês' };
+
+  if (!lastSync) {
+    card.style.display = 'block';
+    card.innerHTML = `
+      <div class="sync-card empty">
+        <div class="sync-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3"/></svg>
+        </div>
+        <div class="sync-card-body">
+          <div class="sync-card-title">Dados simulados — Meta API não sincronizada</div>
+          <div class="sync-card-meta">Clique em "Conectar Meta API" no header para importar dados reais da sua conta.</div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="showApiModal()">Conectar agora</button>
+      </div>`;
+    return;
+  }
+
+  const syncDate = new Date(lastSync);
+  const syncFmt  = syncDate.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+  const hasPurchases = purchases === null || purchases > 0;
+
+  if (!hasPurchases) {
+    card.style.display = 'block';
+    card.innerHTML = `
+      <div class="sync-card warn">
+        <div class="sync-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <div class="sync-card-body">
+          <div class="sync-card-title">Pixel de compra não registrou conversões neste período</div>
+          <div class="sync-card-meta">
+            Verifique se o evento <strong>Purchase</strong> está configurado no Pixel Meta.
+            ${campCount} campanha${campCount !== 1 ? 's' : ''} importada${campCount !== 1 ? 's' : ''} · ${presetLabel[preset] || preset} · Sync: ${syncFmt}
+          </div>
+        </div>
+        <span class="sync-pill sync-pill-amber">${campCount} camp.</span>
+      </div>`;
+    return;
+  }
+
+  card.style.display = 'block';
+  card.innerHTML = `
+    <div class="sync-card ok">
+      <div class="sync-card-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+      </div>
+      <div class="sync-card-body">
+        <div class="sync-card-title">Dados reais sincronizados da Meta API</div>
+        <div class="sync-card-meta">${campCount} campanha${campCount !== 1 ? 's' : ''} importada${campCount !== 1 ? 's' : ''} · ${presetLabel[preset] || preset} · Última sync: ${syncFmt}</div>
+      </div>
+      <span class="sync-pill sync-pill-green">${campCount} camp.</span>
+    </div>`;
 }
 
 function renderCountryChart() {
