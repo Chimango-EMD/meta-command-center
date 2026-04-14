@@ -150,6 +150,72 @@ app.get('/api/meta/status', (req, res) => {
 });
 
 // ──────────────────────────────────────────
+// META: DEBUG
+// ──────────────────────────────────────────
+app.get('/api/meta/debug', async (req, res) => {
+  const token = getToken();
+  if (!token) {
+    return res.status(401).json({ error: 'no_token', message: 'Nenhum token configurado.' });
+  }
+
+  const BASE   = 'https://graph.facebook.com/v19.0';
+  const acctId = getAdAccountId();
+  const result = {
+    account_id:       acctId,
+    timestamp:        new Date().toISOString(),
+    campaigns_raw:    null,
+    first_campaign:   null,
+    insights_raw:     null,
+    actions_raw:      null,
+    cost_per_action_raw: null,
+    campaigns_json:   null,
+    errors:           [],
+  };
+
+  // 1. Raw campaign list
+  try {
+    result.campaigns_raw = await metaGet(
+      `${BASE}/${acctId}/campaigns?fields=id,name,status,objective,daily_budget,lifetime_budget&limit=20&access_token=${token}`
+    );
+  } catch (err) {
+    result.errors.push({ step: 'campaigns', message: err.message, code: err.code });
+  }
+
+  // 2. Insights + actions from first campaign
+  const firstCamp = result.campaigns_raw?.data?.[0];
+  if (firstCamp) {
+    result.first_campaign = { id: firstCamp.id, name: firstCamp.name, status: firstCamp.status };
+
+    try {
+      result.insights_raw = await metaGet(
+        `${BASE}/${firstCamp.id}/insights?fields=spend,impressions,clicks,ctr,cpc,reach,actions,cost_per_action_type&date_preset=last_7d&access_token=${token}`
+      );
+
+      const insightData = result.insights_raw?.data?.[0];
+      if (insightData) {
+        result.actions_raw          = insightData.actions          || [];
+        result.cost_per_action_raw  = insightData.cost_per_action_type || [];
+      } else {
+        result.actions_raw         = [];
+        result.cost_per_action_raw = [];
+        result.errors.push({ step: 'insights', message: 'Sem dados de insights para last_7d nesta campanha.' });
+      }
+    } catch (err) {
+      result.errors.push({ step: 'insights', message: err.message, code: err.code });
+    }
+  }
+
+  // 3. Current campaigns.json on disk
+  try {
+    result.campaigns_json = JSON.parse(fs.readFileSync(CAMPAIGNS_FILE, 'utf8'));
+  } catch (err) {
+    result.errors.push({ step: 'campaigns_json', message: err.message });
+  }
+
+  res.json(result);
+});
+
+// ──────────────────────────────────────────
 // META: SYNC
 // ──────────────────────────────────────────
 app.get('/api/meta/sync', async (req, res) => {
