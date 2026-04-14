@@ -1473,7 +1473,8 @@ function applyMultiplier(m) {
 // HELPERS
 // ══════════════════════════════════════════
 function fmt(n) { return n.toLocaleString('pt-BR', { maximumFractionDigits: 0 }); }
-function fmtCur(n) { return '€' + applyMultiplier(n).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+function fmtCur(n) { return 'R$\u00a0' + applyMultiplier(n).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+function fmtCurBRL(n) { return 'R$\u00a0' + n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 function fmtNum(n) { return fmt(Math.round(applyMultiplier(n))); }
 function fmtPct(n) { return n.toFixed(2) + '%'; }
 function fmtCurRaw(n) { return '€' + n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
@@ -1560,7 +1561,7 @@ function renderOverview() {
   const avgCpr = totalComp > 0 ? (totalInv / totalComp) : 0;
 
   const kpis = [
-    { label: 'Investimento Total', value: fmtCur(totalInv), sub: 'Período selecionado', badge: null, color: 'var(--accent-blue)' },
+    { label: 'Investimento Total', value: 'R$\u00a0' + applyMultiplier(totalInv).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }), sub: 'Período selecionado', badge: null, color: 'var(--accent-blue)' },
     { label: 'Total de Pedidos', value: fmtNum(totalPed), sub: 'Intenções de compra', badge: null, color: 'var(--accent-purple)' },
     { label: 'Total de Compras', value: fmtNum(totalComp), sub: `Conv. Rate ${((totalComp/totalPed)*100).toFixed(1)}%`, badge: null, color: 'var(--accent-green)' },
     { label: 'CTR Médio', value: fmtPct(avgCtr), sub: 'Click-through rate', badge: avgCtr >= 1.8 ? { text: 'Bom', cls: 'badge-green' } : { text: 'Baixo', cls: 'badge-amber' }, color: avgCtr >= 1.8 ? 'var(--accent-green)' : 'var(--accent-amber)' },
@@ -1611,7 +1612,7 @@ function renderCountryChart() {
         borderSkipped: false,
       }]
     },
-    options: chartOpts('€')
+    options: chartOpts('R$')
   });
 }
 
@@ -1654,7 +1655,7 @@ function chartOpts(prefix) {
         bodyColor: '#666680',
         padding: 10,
         callbacks: {
-          label: ctx => `${prefix}${ctx.parsed.y.toLocaleString('pt-BR', { minimumFractionDigits: prefix === '€' ? 2 : 0, maximumFractionDigits: prefix === '€' ? 2 : 0 })}`
+          label: ctx => { const hasCents = prefix === '€' || prefix === 'R$'; return `${prefix}\u00a0${ctx.parsed.y.toLocaleString('pt-BR', { minimumFractionDigits: hasCents ? 2 : 0, maximumFractionDigits: hasCents ? 2 : 0 })}`; }
         }
       }
     },
@@ -1753,7 +1754,7 @@ function renderCampaigns() {
       <td style="font-weight:500">${c.name}</td>
       <td>${c.countries.map(co => `<span style="margin-right:4px">${flagFor(co)} ${co}</span>`).join('')}</td>
       <td>${statusBadge(c.status, c.custo_por_resultado)}</td>
-      <td class="mono">${fmtCurRaw(c.budget_total)}</td>
+      <td class="mono">${fmtCurBRL(c.budget_total)}</td>
       <td class="mono">${fmtCur(c.investimento)}</td>
       <td class="mono">${fmtNum(c.pedidos)}</td>
       <td class="mono" style="font-weight:500;color:var(--accent-green)">${fmtNum(c.compras)}</td>
@@ -1781,7 +1782,7 @@ function renderCampaigns() {
                 <tr style="cursor:default">
                   <td style="font-weight:500">${as.name}</td>
                   <td class="muted" style="font-size:11px">${as.targeting}</td>
-                  <td class="mono">€${as.budget_daily.toFixed(2)}</td>
+                  <td class="mono">R$\u00a0${as.budget_daily.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                   <td class="mono">${fmtCur(as.metrics.investimento)}</td>
                   <td class="mono" style="color:var(--accent-green)">${fmtNum(as.metrics.compras)}</td>
                   <td class="mono" style="color:${cprColor(as.metrics.custo_por_resultado)}">€${as.metrics.custo_por_resultado.toFixed(2)}</td>
@@ -1832,7 +1833,7 @@ function renderAdsets() {
       <td style="font-weight:500">${as.name}</td>
       <td class="muted" style="font-size:12px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${as.campaign}</td>
       <td class="muted" style="font-size:11px;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${as.targeting}</td>
-      <td class="mono">€${as.budget_daily.toFixed(2)}</td>
+      <td class="mono">R$\u00a0${as.budget_daily.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
       <td class="mono">${fmtCur(as.metrics.investimento)}</td>
       <td class="mono">${as.metrics.ctr.toFixed(2)}%</td>
       <td class="mono">€${as.metrics.cpc.toFixed(2)}</td>
@@ -1949,7 +1950,7 @@ function renderAds() {
           <div class="ad-metrics">
             <div class="ad-metric">
               <div class="ad-metric-label">Investido</div>
-              <div class="ad-metric-value">€${inv.toFixed(2)}</div>
+              <div class="ad-metric-value">R$\u00a0${inv.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
             </div>
             <div class="ad-metric">
               <div class="ad-metric-label">CTR</div>
@@ -2001,7 +2002,7 @@ function analyzeAd(adId, evt) {
   if (!ad) return;
   navigate('insights');
   setTimeout(() => {
-    callAI(`Analise em detalhe o anúncio "${ad.name}" (${ad.format}) da campanha "${ad.campaign}". Métricas: Investimento €${ad.metrics.investimento.toFixed(2)}, CTR ${ad.metrics.ctr}%, CPC €${ad.metrics.cpc.toFixed(2)}, ${ad.metrics.compras} compras, CPR €${ad.metrics.custo_por_resultado.toFixed(2)}. Status: ${ad.status}. Dê recomendações específicas e acionáveis.`, `Análise: ${ad.name}`);
+    callAI(`Analise em detalhe o anúncio "${ad.name}" (${ad.format}) da campanha "${ad.campaign}". Métricas: Investimento R$${ad.metrics.investimento.toFixed(2)}, CTR ${ad.metrics.ctr}%, CPC €${ad.metrics.cpc.toFixed(2)}, ${ad.metrics.compras} compras, CPR €${ad.metrics.custo_por_resultado.toFixed(2)}. Status: ${ad.status}. Dê recomendações específicas e acionáveis.`, `Análise: ${ad.name}`);
   }, 400);
 }
 

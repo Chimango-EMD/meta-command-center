@@ -60,14 +60,23 @@ function extractInsights(insights) {
   const actions      = d.actions || [];
   const costPerAction = d.cost_per_action_type || [];
 
-  const findAction = (type) => {
-    const a = actions.find(x => x.action_type === type);
-    return a ? parseFloat(a.value) || 0 : 0;
-  };
-  const findCost = (type) => {
-    const c = costPerAction.find(x => x.action_type === type);
-    return c ? parseFloat(c.value) || 0 : 0;
-  };
+  const purchases = actions?.filter(a =>
+    a.action_type === 'purchase' ||
+    a.action_type === 'omni_purchase' ||
+    a.action_type === 'offsite_conversion.fb_pixel_purchase'
+  ).reduce((sum, a) => sum + parseFloat(a.value || 0), 0) || 0;
+
+  const addToCart = actions?.filter(a =>
+    a.action_type === 'add_to_cart' ||
+    a.action_type === 'omni_add_to_cart' ||
+    a.action_type === 'offsite_conversion.fb_pixel_add_to_cart'
+  ).reduce((sum, a) => sum + parseFloat(a.value || 0), 0) || 0;
+
+  const costPerPurchase = parseFloat(costPerAction?.find(a =>
+    a.action_type === 'purchase' ||
+    a.action_type === 'omni_purchase' ||
+    a.action_type === 'offsite_conversion.fb_pixel_purchase'
+  )?.value || 0);
 
   return {
     investimento:        parseFloat(d.spend) || 0,
@@ -75,9 +84,9 @@ function extractInsights(insights) {
     cliques:             parseInt(d.clicks) || 0,
     ctr:                 parseFloat(d.ctr) || 0,
     cpc:                 parseFloat(d.cpc) || 0,
-    pedidos:             findAction('add_to_cart'),
-    compras:             findAction('purchase'),
-    custo_por_resultado: findCost('purchase'),
+    pedidos:             addToCart,
+    compras:             purchases,
+    custo_por_resultado: costPerPurchase,
     alcance:             parseInt(d.reach) || 0,
   };
 }
